@@ -1,4 +1,6 @@
 ﻿
+using Catalog.API.Exceptions;
+
 namespace Catalog.API.Products.GetProductById;
 
 public record GetProductByIdQuery(Guid Id) : IQuery<GetProdcutByIdResult>;
@@ -8,7 +10,7 @@ internal class GetProductByIdQueryHandler(IDocumentSession session) : IQueryHand
 {
     public async Task<GetProdcutByIdResult> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var product = await session.LoadAsync<Product>(request.Id, cancellationToken);
+        var product = await session.LoadAsync<Product>(request.Id, cancellationToken)?? throw new ProductNotFoundException(request.Id);
         return new GetProdcutByIdResult(product);
     }
 }
